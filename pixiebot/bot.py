@@ -53,9 +53,10 @@ class PixieBot(irc.bot.SingleServerIRCBot):
         LOG.info('Joined channel %s', self.channel)
         time.sleep(0.5)
 
-    def send(self, msg):
+    def send(self, msg, nick):
+        dest = nick or self.channel
         try:
-            self.connection.privmsg(self.channel, msg)
+            self.connection.privmsg(dest, msg)
             time.sleep(0.5)
         except Exception as e:
             LOG.exception('Error sending a message to %(channel)s. '
@@ -63,8 +64,7 @@ class PixieBot(irc.bot.SingleServerIRCBot):
                                                'error': e})
             self.connection.reconnect()
 
-    def on_pubmsg(self, c, e):
-        nick = e.source.split('!')[0]
+    def _handle_msg(self, e, nick=None):
         auth = e.arguments[0][0]
         if auth == '#':
             try:
@@ -74,21 +74,28 @@ class PixieBot(irc.bot.SingleServerIRCBot):
                 return
 
             try:
-                self.do_command(nick, command, args)
+                self.do_command(command, args, nick)
             except Exception as e:
                 error_msg = 'Error executing the command #%s' % command
                 LOG.exception(error_msg + '. Error: %s', e)
-                self.send(pixiesay([error_msg], mood='dead'))
+                self.send(pixiesay([error_msg], mood='dead'), nick)
 
-    def do_command(self, nick, command, args):
+    def on_privmsg(self, c, e):
+        nick = e.source.split('!')[0]
+        self._handle_msg(e, nick=nick)
+
+    def on_pubmsg(self, c, e):
+        self._handle_msg(e)
+
+    def do_command(self, command, args, nick):
         if command == 'pixiesay':
-            self.send(pixiesay(args, easter_eggs=True))
+            self.send(pixiesay(args, easter_eggs=True), nick)
         if command == 'failgraph':
             msg = failgraph(args)
-            self.send(msg)
+            self.send(msg, nick)
         if command == 'findspec':
             msg = findspec(args)
-            self.send(msg)
+            self.send(msg, nick)
 
 def main():
     # TODO(lucasagomes): Make it configurable :-)
