@@ -12,42 +12,67 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import datetime
 import re
 
 from six.moves import urllib
 from BeautifulSoup import BeautifulSoup
-import tinyurl
 
 from utils import ArgumentParser
 
 BASE_URL = 'http://specs.openstack.org/openstack/ironic-specs/specs/%s/'
 
-# TODO(lucasagomes): cache
+_CACHE = {}
 
-def _list_specs(specs, url):
+
+def _update_cache(release):
+    url = BASE_URL % release
     html_page = urllib.request.urlopen(url)
     soup = BeautifulSoup(html_page)
-    spec_list = []
+    specs = {}
     for link in soup.findAll('a', attrs={'href': re.compile('.html$')}):
         href = link.get('href')
-        word_list = href.replace('.html', '').split('-')
-        if all([True if w.lower() in word_list else False for w in specs]):
-            spec_url = tinyurl.create_one(url + href)
-            spec_list.append({'title': ' '.join(word_list), 'link': spec_url})
+        title = ' '.join(href.replace('.html', '').split('-'))
+        link = url + href
+        specs[title] = link
+
+    _CACHE[release] = {}
+    _CACHE[release]['specs'] = specs
+    _CACHE[release]['updated_at'] = datetime.datetime.utcnow()
+
+
+def find_specs(words, release):
+    if release not in _CACHE:
+        _update_cache(release)
+
+    # Check for cache invalidation
+    time_now = datetime.datetime.utcnow()
+    updated_delta = time_now - _CACHE[release]['updated_at']
+    #FIXME(lucasagomes): do not hardcode the cache expiration time
+    if updated_delta > datetime.timedelta(hours=5):
+        _update_cache(release)
+
+    cached_release = _CACHE[release]
+    spec_list = []
+    for title in cached_release['specs']:
+        word_list = title.split()
+        if all([True if w.lower() in word_list else False for w in words]):
+            spec_list.append({'title': title,
+                              'link': cached_release['specs'][title]})
     return spec_list
 
 
 def parse_args(args):
     parser = ArgumentParser()
-    parser.add_argument('specs', nargs='+')
-    parser.add_argument('-c', '--cycle', type=str, default='approved',
-                        help='The name of the release cycle')
+    parser.add_argument('words', nargs='+')
+    parser.add_argument('-r', '--release', type=str, default='approved',
+                        help='The name or version of the release')
     return parser.parse_args(args)
 
 
 def findspec(args):
     args = parse_args(args)
-    specs = _list_specs(args.specs, BASE_URL % args.cycle)
+    specs = find_specs(args.words, args.release)
     if not specs:
         return 'No specs found'
 
