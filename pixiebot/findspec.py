@@ -19,6 +19,9 @@ from six.moves import urllib
 from BeautifulSoup import BeautifulSoup
 
 from utils import ArgumentParser
+from log import get_logger
+
+LOG = get_logger()
 
 BASE_URL = 'http://specs.openstack.org/openstack/ironic-specs/specs/%s/'
 
@@ -26,6 +29,7 @@ _CACHE = {}
 
 
 def _update_cache(release):
+    LOG.debug('Updating cache for the release "%s"', release)
     url = BASE_URL % release
     html_page = urllib.request.urlopen(url)
     soup = BeautifulSoup(html_page)
@@ -39,6 +43,7 @@ def _update_cache(release):
     _CACHE[release] = {}
     _CACHE[release]['specs'] = specs
     _CACHE[release]['updated_at'] = datetime.datetime.utcnow()
+    LOG.info('Cache updated for the release "%s"', release)
 
 
 def find_specs(words, release):
