@@ -1,0 +1,4 @@
+TinyUrl~=0.1.0
+requests~=2.10.0
+irc~=14.2
+BeautifulSoup~=3.2.1
