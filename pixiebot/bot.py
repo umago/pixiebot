@@ -19,6 +19,7 @@ import irc.bot
 from pixiesay import pixiesay
 from failgraph import failgraph
 from findspec import findspec
+from help_message import help_message
 from log import get_logger
 
 LOG = get_logger()
@@ -95,6 +96,9 @@ class PixieBot(irc.bot.SingleServerIRCBot):
             self.send(msg, nick)
         if command == 'findspec':
             msg = findspec(args)
+            self.send(msg, nick)
+        if command == 'help':
+            msg = help_message(args)
             self.send(msg, nick)
 
 def main():
