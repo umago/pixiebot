@@ -17,10 +17,10 @@ import time
 
 import irc.bot
 
-from pixiesay import pixiesay
 from failgraph import failgraph
 from findspec import findspec
 from log import get_logger
+from pixiesay import pixiesay
 
 LOG = get_logger()
 
@@ -98,6 +98,7 @@ class PixieBot(irc.bot.SingleServerIRCBot):
             msg = findspec(args)
             self.send(msg, nick)
 
+
 def main():
     parser = argparse.ArgumentParser(
         description='Pixie Boots - the friendly bot')
@@ -112,6 +113,7 @@ def main():
     args = parser.parse_args()
     bot = PixieBot(args.channel, args.nickname, args.server, args.port)
     bot.start()
+
 
 if __name__ == "__main__":
     main()

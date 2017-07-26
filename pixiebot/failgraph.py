@@ -39,7 +39,7 @@ def graphite_base_url(since=200, avg=12):
             '&height=500&until=now&width=800&bgcolor=ffffff'
             '&fgcolor=000000&yMax=100&yMin=0&vtitle=%s'
             '&title=%s&drawNullAsZero=true'
-    ) % (since, ylabel, title)
+            ) % (since, ylabel, title)
 
 
 def failrate(job, queue, color, width=1, avg=12):
@@ -90,7 +90,7 @@ def parse_args(args):
     parser.add_argument('-d', '--duration', type=int, default=200,
                         help='Graph over duration hours (default 200)')
     parser.add_argument('-s', '--smoothing', type=int, default=12,
-                       help='Rolling average hours (defaults to 12)')
+                        help='Rolling average hours (defaults to 12)')
     return parser.parse_args(args)
 
 

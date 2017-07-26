@@ -60,6 +60,7 @@ def parse_args(args):
                         help='PixieBoots mood')
     return parser.parse_known_args(args)
 
+
 def pixiesay(args, easter_eggs=False, mood=None):
     args, _ = parse_args(args)
 
@@ -76,4 +77,3 @@ def pixiesay(args, easter_eggs=False, mood=None):
     pixie = MOODS.get(mood, MOODS['default'])
     delimiter = ':' if msg else ''
     return u'%s%s %s' % (pixie, delimiter, msg)
-
