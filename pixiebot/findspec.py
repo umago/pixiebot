@@ -15,11 +15,11 @@
 import datetime
 import re
 
-from six.moves import urllib
 from BeautifulSoup import BeautifulSoup
+from six.moves import urllib
 
-from utils import ArgumentParser
 from log import get_logger
+from utils import ArgumentParser
 
 LOG = get_logger()
 
@@ -53,7 +53,7 @@ def find_specs(words, release):
     # Check for cache invalidation
     time_now = datetime.datetime.utcnow()
     updated_delta = time_now - _CACHE[release]['updated_at']
-    #FIXME(lucasagomes): do not hardcode the cache expiration time
+    # FIXME(lucasagomes): do not hardcode the cache expiration time
     if updated_delta > datetime.timedelta(hours=5):
         _update_cache(release)
 
@@ -84,7 +84,7 @@ def findspec(args):
     msg = ''
     for n, s in enumerate(specs, 1):
         if msg:
-           msg += ' | '
-        msg +='"%(title)s": %(link)s ' % s
+            msg += ' | '
+        msg += '"%(title)s": %(link)s ' % s
 
     return '%d spec(s) found: %s' % (len(specs), msg)

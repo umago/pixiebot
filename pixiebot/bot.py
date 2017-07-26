@@ -12,14 +12,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import argparse
 import time
 
 import irc.bot
 
-from pixiesay import pixiesay
 from failgraph import failgraph
 from findspec import findspec
 from log import get_logger
+from pixiesay import pixiesay
 
 LOG = get_logger()
 
@@ -97,14 +98,22 @@ class PixieBot(irc.bot.SingleServerIRCBot):
             msg = findspec(args)
             self.send(msg, nick)
 
+
 def main():
-    # TODO(lucasagomes): Make it configurable :-)
-    channel = '#openstack-ironic'
-    nickname = 'PixieBoots'
-    server = 'irc.freenode.net'
-    port = 6667
-    bot = PixieBot(channel, nickname, server, port)
+    parser = argparse.ArgumentParser(
+        description='Pixie Boots - the friendly bot')
+    parser.add_argument('-c', '--channel', help='IRC channel to join',
+                        default='#openstack-ironic')
+    parser.add_argument('-s', '--server', help='IRC server to use',
+                        default='irc.freenode.net')
+    parser.add_argument('-p', '--port', help='IRC port to use',
+                        default=6667, type=int)
+    parser.add_argument('-n', '--nickname', help='Bot name',
+                        default='PixieBoots')
+    args = parser.parse_args()
+    bot = PixieBot(args.channel, args.nickname, args.server, args.port)
     bot.start()
+
 
 if __name__ == "__main__":
     main()
