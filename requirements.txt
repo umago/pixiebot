@@ -1,4 +1,5 @@
-TinyUrl~=0.1.0
-requests~=2.10.0
-irc~=14.2
-BeautifulSoup~=3.2.1
+TinyUrl>=0.1.0,<0.2
+requests>=2.10.0,<3.0
+irc>=14.2,<15.0
+BeautifulSoup>=3.2.1,<4.0
+backports.functools-lru-cache>=1.4,<2.0
